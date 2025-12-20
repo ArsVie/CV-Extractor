@@ -14,3 +14,22 @@ Requerido por `pdf2image` para leer archivos PDF.
 - **Ubuntu/Debian:** `sudo apt-get install poppler-utils`
 - **MacOS:** `brew install poppler`
 - **Windows:** Descargar binario y agregar al PATH del sistema.
+
+
+## Uso
+
+Crea un archivo llamado main.py e importa tu módulo:
+
+```
+from cv_extractor import CVExtractor
+import json
+
+# Inicializar
+pipeline = CVExtractor()
+
+# Ejecutar Extracción
+# context_tags ayuda a la IA a enfocarse en dominios específicos (opcional)
+data = pipeline.process("ruta/a/mi_cv.pdf", context_tags=["Data Science", "Python"])
+
+# Imprimir Resultado
+print(json.dumps(data, indent=4, ensure_ascii=False))```
