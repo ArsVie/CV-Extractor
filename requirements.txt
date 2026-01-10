@@ -1,5 +1,3 @@
 markitdown[all]
 ollama
-pdf2image
-pytesseract
 chromadb
