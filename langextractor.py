@@ -11,7 +11,6 @@ from langchain_core.output_parsers import JsonOutputParser
 #Current date as MM-YYYY
 from datetime import datetime
 now = datetime.now()
-current_date = now.strftime("%m-%Y")
 # --- 1. DEFINE THE STRICT SCHEMA (PYDANTIC) ---
 # This replaces the manual JSON description. 
 # The LLM will strictly adhere to these types.
@@ -29,7 +28,7 @@ class EducationItem(BaseModel):
     Fecha: Optional[str] = Field(description="MM-YYYY or Date range")
 
 class CVData(BaseModel):
-    Name: Optional[str] = Field(description="Full name of the candidate")
+    Nombre: Optional[str] = Field(description="Full name of the candidate")
     Correo: Optional[str] = Field(description="Email address")
     Telefono: Optional[str] = Field(description="Phone number without spaces if possible")
     Descripcion: Optional[str] = Field(description="Profile description from the top of the text")
@@ -58,10 +57,14 @@ Your task is to parse a Markdown (MD) CV and extract data into a precise JSON fo
 ### DATE FORMATTING RULES (STRICT):
 - Format: "MM-YYYY" (String).
 - If only Year (e.g., "2020"): Return "01-2020".
-- If "Present", "Actual", "Current": Return "12-2025".
+- **CRITICAL**: If "Present", "Actual", "Current" in ANY language: YOU MUST CONVERT to {{current_date}}.
 
 ### SKILL EXTRACTION:
 - **Global Skills**: Explicit skills from the Skills section.
+
+### ACTIVITY EXTRACTION:
+- Extract EVERY bullet point under each job as a separate list item
+- Do NOT summarize or combine activities
 
 ### EMPLOYMENT STATUS:
 - Set 'Empleado' to True if any job date indicates "Present" or "Actual".
@@ -88,7 +91,8 @@ class LangExtractor:
         self.prompt = PromptTemplate(
             template=EXTRACT_TEMPLATE,
             input_variables=["cv_text"],
-            partial_variables={"format_instructions": self.parser.get_format_instructions()}
+            partial_variables={"format_instructions": self.parser.get_format_instructions()},
+            current_date=now.strftime("%m-%Y")
         )
         
         # Create the Chain
@@ -138,7 +142,7 @@ if __name__ == "__main__":
     # Path to your file (PDF, Docx, etc.)
     # For testing, you can pass a string directly if you modify the extract method slightly,
     # but here we follow the file workflow.
-    file_path = "cv_final-4.pdf" 
+    file_path = "CV_EN.pdf" 
     
     # Run
     # Note: Since I don't have a real PDF file here, ensure you provide a valid path.
